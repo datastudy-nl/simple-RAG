@@ -1,21 +1,20 @@
-# main.py
-
 """
 main.py
 Main entry point - uses rag.py and Ollama API for RAG.
 """
 
-
 import requests
-import rag
+
 import fileutils
+import rag
 
-
-# ---------------------------
 # ---------------------------
 # Ollama API constants
+# ---------------------------
+
 OLLAMA_URL = "http://localhost:11434/api/generate"
-OLLAMA_MODEL = "mistral"
+OLLAMA_MODEL = "gemma3"
+
 
 def query_ollama(model: str, prompt: str) -> str:
     """
@@ -27,7 +26,7 @@ def query_ollama(model: str, prompt: str) -> str:
         str: LLM response.
     """
     payload = {"model": model, "prompt": prompt}
-    resp = requests.post(OLLAMA_URL, json=payload, stream=True)
+    resp = requests.post(OLLAMA_URL, json=payload, stream=True, timeout=30)
     output = ""
     for line in resp.iter_lines():
         if line:
@@ -41,6 +40,7 @@ def query_ollama(model: str, prompt: str) -> str:
 # ---------------------------
 # Main Flow
 # ---------------------------
+
 
 def main():
     """
@@ -84,7 +84,7 @@ def main():
         print(answer)
         print("\n--- Sources ---")
         for doc, score in retrieved:
-            print("-", doc[:200].replace("\n", " "), "...")
+            print("-", doc[:200].replace("\n", " "), f"... (score: {score:.4f})")
 
 
 if __name__ == "__main__":
